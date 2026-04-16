@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Konrad — London Taper</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Bebas+Neue&display=swap');
+:root{--ink:#0a0a0a;--paper:#f5f0e8;--mid:#888;--rule:#ccc;--dim:#e0dbd0;--sel:#d0cbc1;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:'Courier Prime',monospace;font-size:13px;line-height:1.4;max-width:980px;margin:0 auto;padding:20px 24px;}
+
+.header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid var(--ink);padding-bottom:8px;margin-bottom:14px;}
+.header-name{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;line-height:1;}
+.header-sub{font-size:10px;color:var(--mid);text-transform:uppercase;letter-spacing:1px;}
+.countdown{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;text-align:right;}
+.countdown-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--mid);text-align:right;}
+
+.prs{display:grid;grid-template-columns:repeat(4,1fr);border:1.5px solid var(--ink);margin-bottom:14px;}
+.pr-cell{padding:6px 10px;border-right:1px solid var(--ink);}
+.pr-cell:last-child{border-right:none;}
+.pr-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mid);margin-bottom:1px;}
+.pr-value{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;}
+.pr-note{font-size:9px;color:var(--mid);}
+
+.section-head{font-size:9px;text-transform:uppercase;letter-spacing:3px;color:var(--mid);border-bottom:1px solid var(--rule);padding-bottom:3px;margin-bottom:8px;margin-top:16px;}
+
+.chart-wrap{position:relative;height:100px;width:100%;}
+
+.week-block{border:1.5px solid var(--ink);}
+.week-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;padding:5px 12px;border-bottom:1.5px solid var(--ink);background:var(--ink);color:var(--paper);display:flex;justify-content:space-between;align-items:center;}
+.week-km{font-size:16px;letter-spacing:1px;}
+.week-km span{font-size:11px;opacity:.7;margin-left:4px;}
+.week-days{display:grid;grid-template-columns:repeat(7,1fr);}
+.day-col{border-right:1px solid var(--rule);cursor:pointer;min-height:72px;transition:background 0.1s;}
+.day-col:last-child{border-right:none;}
+.day-col:hover{background:var(--dim);}
+.day-col.today{background:#ddd8cf;}
+.day-col.selected{background:var(--sel);outline:2px solid var(--ink);outline-offset:-2px;}
+.day-head{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--mid);padding:3px 6px 2px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;}
+.day-date{font-size:9px;color:var(--ink);font-weight:700;}
+.day-body{padding:4px 6px;}
+.day-name{font-size:9px;font-weight:700;line-height:1.2;margin-bottom:2px;}
+.day-dist{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.5px;}
+.day-pace{font-size:8px;color:var(--mid);}
+.day-hr{font-size:8px;color:var(--mid);}
+.day-off{font-size:9px;color:#ccc;font-style:italic;padding:4px 6px;}
+.day-planned{font-size:9px;color:var(--mid);padding:4px 6px;line-height:1.35;}
+.day-planned strong{color:var(--ink);font-size:9px;display:block;margin-bottom:1px;}
+.day-planned small{font-size:8px;color:#bbb;}
+.tag{display:inline-block;font-size:7px;text-transform:uppercase;letter-spacing:.5px;border:1px solid;padding:0 3px;margin-top:2px;}
+.tag-good{border-color:var(--ink);color:var(--ink);font-weight:700;}
+.tag-ok{border-color:#aaa;color:#aaa;}
+.tag-warn{border-color:#555;color:#555;font-weight:700;}
+.tag-race{border-color:var(--ink);color:var(--paper);background:var(--ink);font-weight:700;}
+
+/* FULLSCREEN OVERLAY */
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--paper);z-index:100;overflow-y:auto;}
+.overlay.open{display:block;}
+.overlay-inner{max-width:980px;margin:0 auto;padding:28px 32px 48px;}
+.overlay-close{position:fixed;top:20px;right:28px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;background:var(--ink);color:var(--paper);border:none;cursor:pointer;padding:6px 14px;z-index:101;}
+.overlay-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;line-height:1;border-bottom:3px solid var(--ink);padding-bottom:10px;margin-bottom:20px;}
+.overlay-date{font-size:11px;color:var(--mid);text-transform:uppercase;letter-spacing:2px;margin-top:4px;}
+.overlay-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+
+.stat-block{margin-bottom:20px;}
+.stat-block-title{font-size:9px;text-transform:uppercase;letter-spacing:3px;color:var(--mid);border-bottom:1px solid var(--rule);padding-bottom:3px;margin-bottom:8px;}
+.stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #e8e3da;font-size:13px;}
+.stat-row:last-child{border-bottom:none;}
+.stat-label{color:var(--mid);}
+.stat-val{font-weight:700;}
+.stat-val-big{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
+
+.laps-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px;}
+.laps-table th{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--mid);text-align:left;padding:3px 8px 3px 0;border-bottom:1px solid var(--rule);font-weight:400;}
+.laps-table td{padding:4px 8px 4px 0;border-bottom:1px solid #e8e3da;vertical-align:top;}
+.laps-table tr:last-child td{border-bottom:none;}
+.lap-key{font-weight:700;}
+
+.feedback-title{font-size:9px;text-transform:uppercase;letter-spacing:3px;color:var(--mid);border-bottom:1px solid var(--rule);padding-bottom:3px;margin-bottom:12px;}
+.feedback-text{font-size:14px;line-height:1.75;color:var(--mid);}
+.feedback-rule{margin-top:18px;padding-top:14px;border-top:1px solid var(--rule);}
+.feedback-rule-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--ink);margin-bottom:5px;}
+.feedback-rule-body{font-size:12px;color:var(--mid);line-height:1.6;}
+
+.pace-ref{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--rule);}
+.pace-cell{padding:6px 8px;border-right:1px solid var(--rule);}
+.pace-cell:last-child{border-right:none;}
+.pace-type{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--mid);margin-bottom:1px;}
+.pace-val{font-family:'Bebas Neue',sans-serif;font-size:15px;}
+
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+.note-row{border-left:3px solid var(--ink);padding:4px 8px;}
+.note-title{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:2px;}
+.note-body{font-size:10px;color:var(--mid);line-height:1.5;}
+
+.footer{margin-top:14px;padding-top:6px;border-top:1px solid var(--rule);font-size:9px;color:var(--mid);display:flex;justify-content:space-between;text-transform:uppercase;letter-spacing:1px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-name">Konrad Knitter</div>
+    <div class="header-sub">London Marathon 2026 — Taper Protocol</div>
+  </div>
+  <div>
+    <div class="countdown">10</div>
+    <div class="countdown-label">dni do startu · Nd 26.04.2026</div>
+  </div>
+</div>
+
+<div class="prs">
+  <div class="pr-cell"><div class="pr-label">Maraton PB</div><div class="pr-value">3:22:32</div><div class="pr-note">Tokyo, marzec 2025</div></div>
+  <div class="pr-cell"><div class="pr-label">Półmaraton PB</div><div class="pr-value">1:31:18</div><div class="pr-note">Montecatini, sty 2026</div></div>
+  <div class="pr-cell"><div class="pr-label">10 km PB</div><div class="pr-value">40:55</div><div class="pr-note">MkCafe 2025</div></div>
+  <div class="pr-cell"><div class="pr-label">Cel Londyn</div><div class="pr-value">3:15</div><div class="pr-note">target pace 4:37/km</div></div>
+</div>
+
+<div class="section-head">Kilometraż — ostatnie 8 tygodni</div>
+<div class="chart-wrap">
+  <canvas id="kmChart" role="img" aria-label="Kilometraż tygodniowy 8 tygodni">37, 49, 48, 56, 67, 77, 64, 32 km.</canvas>
+</div>
+
+<div class="section-head">Poprzedni tydzień · Pn 06.04 — Nd 12.04.2026</div>
+<div class="week-block">
+  <div class="week-title"><span>06–12 Kwi 2026</span><span class="week-km">64,2 km</span></div>
+  <div class="week-days" id="wd0"></div>
+</div>
+
+<div class="section-head">Bieżący tydzień · Pn 13.04 — Nd 19.04.2026</div>
+<div class="week-block">
+  <div class="week-title"><span>13–19 Kwi 2026</span><span class="week-km">32,6 km <span>/ ~58 km plan</span></span></div>
+  <div class="week-days" id="wd1"></div>
+</div>
+
+<div class="section-head">Race Week · Pn 20.04 — Nd 26.04.2026</div>
+<div class="week-block">
+  <div class="week-title"><span>20–26 Kwi 2026 — LONDON MARATHON</span><span class="week-km">~66 km <span>plan (incl. 42,2)</span></span></div>
+  <div class="week-days" id="wd2"></div>
+</div>
+
+<div class="section-head">Tempa referencyjne</div>
+<div class="pace-ref">
+  <div class="pace-cell"><div class="pace-type">Easy</div><div class="pace-val">5:10–5:30</div></div>
+  <div class="pace-cell"><div class="pace-type">MP Londyn</div><div class="pace-val">4:35–4:40</div></div>
+  <div class="pace-cell"><div class="pace-type">Threshold</div><div class="pace-val">4:05–4:10</div></div>
+  <div class="pace-cell"><div class="pace-type">Interwał 1 km</div><div class="pace-val">4:08–4:12</div></div>
+  <div class="pace-cell"><div class="pace-type">Recovery</div><div class="pace-val">5:40–6:00</div></div>
+</div>
+
+<div class="section-head">Zasady i porady</div>
+<div class="notes-grid">
+  <div class="note-row">
+    <div class="note-title">Taper — czego nie robić</div>
+    <div class="note-body">Nie nadrabiasz niczego. Forma jest tam gdzie jest. Nie gonisz tempa po wolnym km. Freshness &gt; hero workouts.</div>
+  </div>
+  <div class="note-row">
+    <div class="note-title">Logistyka Londyn</div>
+    <div class="note-body">Minimum chodzenia w pt i sb. Żadnej turystyki. Nogi na górze wieczorem. Expo: numer i wyjdź.</div>
+  </div>
+  <div class="note-row">
+    <div class="note-title">Strategia startowa</div>
+    <div class="note-body">Km 1–10: 4:40–4:45 — tłum wciągnie, nie daj się.<br>Km 10–30: 4:37 — buduj rytm.<br>Km 30–42: full send.<br>Gele: start · 7 · 14 · 21 · 30 km.</div>
+  </div>
+  <div class="note-row">
+    <div class="note-title">Warunki Londyn 26.04</div>
+    <div class="note-body">Prognoza ~10–14°C — idealne dla Ciebie. Zero ryzyka heat stress. Twój klimat. Pamiętaj o Berlinie i rób odwrotnie.</div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Aktualizacja: Czw 16.04.2026</span>
+  <span>Dziś Czw: done · Pt OFF · So easy+strides · Nd 18km</span>
+  <span>Konrad × Claude Co-Trainer</span>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <button class="overlay-close" onclick="closeOverlay()">✕ ZAMKNIJ</button>
+  <div class="overlay-inner">
+    <div class="overlay-title" id="oTitle"></div>
+    <div class="overlay-date" id="oDate"></div>
+    <div style="margin-top:20px;" class="overlay-grid">
+      <div id="oStats"></div>
+      <div id="oFeedback"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// WEEK 0: Pn 06.04 – Nd 12.04
+// Apr 6=Pn, 7=Wt, 8=Sr, 9=Czw, 10=Pt, 11=So, 12=Nd
+const week0 = [
+  {day:'Pn', date:'06.04', done:true},
+  {day:'Wt', date:'07.04', done:true,
+    name:'Zone 2 Day', dist:14.1, pace:'5:40', hr:'125', tag:'good', tagLabel:'Ideał',
+    stats:[['Dystans','14,1 km'],['Czas','1h 19m'],['Avg pace','5:40/km'],['Avg HR','125 bpm'],['HR zakres','116–132 bpm'],['Typ','Easy Z2']],
+    laps:[
+      {n:'km 1–3',pace:'5:44/km',hr:'117–122',note:'wolny start'},
+      {n:'km 4–11',pace:'5:37/km',hr:'122–131',note:'Z2 steady'},
+      {n:'km 12–14',pace:'5:34/km',hr:'126–132',note:'finish'},
+    ],
+    feedback:'Perfekcyjny bieg. HR 116–132 przez cały czas — czyste Z2. Taka objętość przy takim HR to dokładnie co trzeba tydzień przed ostatnim LSD. Żadnych skoków, żadnego dryftu.',
+    rules:[{t:'Co to oznacza',b:'Baza tlenowa działa. Nogi gotowe na mocniejszy bodziec.'}]
+  },
+  {day:'Śr', date:'08.04', done:true,
+    name:'Mus to mus', dist:13.1, pace:'4:58', hr:'152', tag:'ok', tagLabel:'Progresja MP',
+    stats:[['Dystans','13,1 km'],['Czas','1h 5m'],['WU','3 km @ 5:43–5:58/km'],['MP segmenty','8×1 km @ 4:28–4:35/km'],['Avg HR na MP','~154 bpm'],['HR max','164 bpm'],['CD','2 km easy']],
+    laps:[
+      {n:'WU 3 km',pace:'5:50/km',hr:'115–122',note:'rozgrzewka'},
+      {n:'km 4',pace:'4:28/km',hr:'146',note:'MP'},
+      {n:'km 5',pace:'4:34/km',hr:'150',note:'MP'},
+      {n:'km 6',pace:'4:30/km',hr:'152',note:'MP'},
+      {n:'km 7',pace:'4:31/km',hr:'154',note:'MP'},
+      {n:'km 8',pace:'4:31/km',hr:'156',note:'MP'},
+      {n:'km 9',pace:'4:31/km',hr:'157',note:'MP'},
+      {n:'km 10',pace:'4:35/km',hr:'159',note:'MP'},
+      {n:'km 11',pace:'4:29/km',hr:'160',note:'MP — finisz'},
+      {n:'CD 2 km',pace:'5:28/km',hr:'137',note:'cooldown'},
+    ],
+    feedback:'Ukryty trening MP — 8 km @ 4:28–4:35 z HR 146–164. Tempo MP trzymane bez problemów, drift HR kontrolowany. Minusem jest bliskość do niedzielnego LSD, ale nogi wytrzymały. Bardzo dobry sygnał formy.',
+    rules:[{t:'Wniosek pod Londyn',b:'Tempo 4:28–4:35 przy HR 150–164 sugeruje że pace 4:37 to plan z zapasem — serce miało rezerwę.'}]
+  },
+  {day:'Czw', date:'09.04', done:true,
+    name:'Czwartek czwartek', dist:10.2, pace:'5:19', hr:'—', tag:'good', tagLabel:'Dobrze',
+    stats:[['Dystans','10,2 km'],['Czas','54m 26s'],['Avg pace','5:19/km'],['Typ','Easy czwartek']],
+    laps:[],
+    feedback:'Easy czwartek trafiony — 10 km spokojnie po mocnej środzie. Dobra regeneracja przed weekendem.',
+    rules:[]
+  },
+  {day:'Pt', date:'10.04', done:true},
+  {day:'So', date:'11.04', done:true,
+    name:'Weird Relay', dist:2.4, pace:'—', hr:'—', tag:'ok', tagLabel:'Neutral',
+    stats:[['Dystans','~2,4 km'],['Typ','Sprinty sztafetowe'],['Czas','~11 min łącznie'],['Efekt','Aktywacja NM']],
+    laps:[{n:'3 × ~800m sprint',pace:'~3:00–3:30/km',hr:'—',note:'sztafeta z ekipą'}],
+    feedback:'Krótkie sprinty sztafetowe — dobry bodziec nerwowo-mięśniowy przed LSD. Nie zaszkodził, wręcz przydatna aktywacja.',
+    rules:[]
+  },
+  {day:'Nd', date:'12.04', done:true,
+    name:'LSD + MP finish', dist:24.2, pace:'5:16', hr:'140', tag:'good', tagLabel:'Kluczowy',
+    stats:[['Dystans','24,2 km'],['Czas','2h 7m'],['Avg pace','5:16/km'],['Avg HR','~140 bpm'],['Easy faza (17 km)','HR 117–145 · 5:16–5:43/km'],['MP segment (5 km)','4:29–4:35/km'],['HR na MP','155–165 bpm']],
+    laps:[
+      {n:'km 1–17',pace:'5:20–5:43/km',hr:'118–145',note:'easy base'},
+      {n:'km 18',pace:'4:33/km',hr:'155',note:'MP start'},
+      {n:'km 19',pace:'4:34/km',hr:'157',note:'MP'},
+      {n:'km 20',pace:'4:35/km',hr:'160',note:'MP'},
+      {n:'km 21',pace:'4:31/km',hr:'164',note:'MP'},
+      {n:'km 22',pace:'4:29/km',hr:'165',note:'MP — finisz'},
+      {n:'km 23–24',pace:'5:30/km',hr:'151',note:'cooldown'},
+    ],
+    feedback:'Idealny ostatni LSD. 17 km czyste easy, potem 5 km @ 4:29–4:35 przy HR 155–165 — nogi odpowiedziały bez problemu. To był ostatni prawdziwy bodziec treningowy. Forma jest — teraz tylko świeżenie.',
+    rules:[{t:'Wniosek pod Londyn',b:'MP @ 4:29–4:35 przy HR 155–165 z rezerwą. Biodro nie protestowało. Forma jest tam gdzie powinna być.'}]
+  },
+];
+
+// WEEK 1: Pn 13.04 – Nd 19.04
+// Apr 13=Pn, 14=Wt, 15=Sr, 16=Czw(DZIŚ), 17=Pt, 18=So, 19=Nd
+const week1 = [
+  {day:'Pn', date:'13.04', done:true},
+  {day:'Wt', date:'14.04', done:true,
+    name:'Ploteczki Run', dist:12.3, pace:'5:33', hr:'125', tag:'good', tagLabel:'Ideał',
+    stats:[['Dystans','12,3 km'],['Czas','1h 8m'],['Avg pace','5:33/km'],['Avg HR','125 bpm'],['HR max','135 bpm'],['HR zakres','111–135 bpm'],['Typ','Easy Z2 taper']],
+    laps:[
+      {n:'km 1',pace:'5:34/km',hr:'111',note:'wolny start'},
+      {n:'km 2–12',pace:'5:20–5:38/km',hr:'121–132',note:'czyste Z2'},
+    ],
+    feedback:'Taper działa. HR 111–132 przez cały bieg, tempo spokojne. Idealny wtorek taperu — nogi spokojne, forma zbiera się w środku.',
+    rules:[]
+  },
+  {day:'Śr', date:'15.04', done:true,
+    name:'Morning Track', dist:10.2, pace:'5:01', hr:'↑170', tag:'warn', tagLabel:'Za ostro',
+    stats:[['Dystans','10,2 km'],['Czas','51m 18s'],['WU','2 km @ 6:40–6:57/km'],['Interwały','4×1 km'],['Faktyczne tempo','3:50–3:54/km'],['Planowane tempo','4:08–4:12/km'],['Delta','~15 sek/km za szybko'],['HR max','170 bpm'],['CD','2 km @ 4:53–5:05/km']],
+    laps:[
+      {n:'WU 2 km',pace:'6:50/km',hr:'114',note:'rozgrzewka'},
+      {n:'Interwał 1',pace:'3:54/km',hr:'151–159',note:'plan: 4:08–4:12'},
+      {n:'Przerwa 90s',pace:'trucht',hr:'143–147',note:''},
+      {n:'Interwał 2',pace:'3:52/km',hr:'158–163',note:'plan: 4:08–4:12'},
+      {n:'Przerwa 90s',pace:'trucht',hr:'147–148',note:''},
+      {n:'Interwał 3',pace:'3:54/km',hr:'158–163',note:'plan: 4:08–4:12'},
+      {n:'Przerwa 90s',pace:'trucht',hr:'148–164',note:''},
+      {n:'Interwał 4',pace:'3:46/km',hr:'162–170',note:'najszybszy — za dużo'},
+      {n:'CD 2 km',pace:'4:53–5:05/km',hr:'138–152',note:'cooldown'},
+    ],
+    feedback:'Forma jest — te czasy mówią głośno. Ale 15 sek/km ponad plan w środku taperu to za wysoki koszt nerwowo-mięśniowy. HR do 170 na 4. interwale. Czwartek był koniecznością, nie wyborem.',
+    rules:[
+      {t:'Wniosek pozytywny',b:'3:46–3:54/km przy HR 163–170 potwierdza dobrą formę szybkościową przed startem.'},
+      {t:'Ryzyko',b:'W race week środa: 4×600m rytmowo — nie powtarzaj tego błędu.'}
+    ]
+  },
+  {day:'Czw', date:'16.04', done:true, isToday:true,
+    name:'Czwartek to prawie piątek', dist:10.1, pace:'5:34', hr:'128', tag:'good', tagLabel:'Ideał',
+    stats:[['Dystans','10,1 km'],['Czas','55m 58s'],['Avg pace','5:34/km'],['Avg HR','128 bpm'],['HR max','141 bpm'],['HR zakres','116–141 bpm'],['Typ','Easy — absorpcja po środzie']],
+    laps:[
+      {n:'km 1',pace:'5:51/km',hr:'116',note:'bardzo wolny start'},
+      {n:'km 2–10',pace:'5:23–5:41/km',hr:'122–134',note:'Z2 steady'},
+    ],
+    feedback:'Perfekcyjna odpowiedź na ostrą środę. HR 115–134 przez 90% biegu, max 141. Nogi regenerują się normalnie. Taper przebiega prawidłowo.',
+    rules:[{t:'Aktualny stan',b:'Trzy dni taperu za Tobą. Nogi spokojne, forma się kumuluje. Jutro OFF — priorytet sen.'}]
+  },
+  {day:'Pt', date:'17.04', planned:'OFF', detail:'Pełny odpoczynek · sen priorytetem'},
+  {day:'So', date:'18.04', planned:'6–8 km easy', detail:'+ 4–6 strides 20s · swobodnie'},
+  {day:'Nd', date:'19.04', planned:'18 km', detail:'14–15 km easy + 3 km @ 4:35–4:40 · dolna granica!'},
+];
+
+// WEEK 2: Pn 20.04 – Nd 26.04
+// Apr 20=Pn, 21=Wt, 22=Sr, 23=Czw, 24=Pt, 25=So, 26=Nd=MARATHON
+const week2 = [
+  {day:'Pn', date:'20.04', planned:'OFF'},
+  {day:'Wt', date:'21.04', planned:'8–10 km easy', detail:'5:10–5:30/km · lekko'},
+  {day:'Śr', date:'22.04', planned:'4×600 m', detail:'2 km WU + trucht + 2 km CD · rytm nie zgon'},
+  {day:'Czw', date:'23.04', planned:'8 km easy', detail:'Ostatni normalny bieg'},
+  {day:'Pt', date:'24.04', planned:'OFF', detail:'Przylot · nogi na górze wieczorem'},
+  {day:'So', date:'25.04', planned:'20–25 min easy', detail:'+ 4 strides · żadnej turystyki!'},
+  {day:'Nd', date:'26.04',
+    name:'LONDON MARATHON', dist:42.2, pace:'4:37 cel', hr:'—', tag:'race', tagLabel:'RACE',
+    stats:[['Dystans','42,195 km'],['Cel','3:15:00'],['Target pace','4:37/km'],['Km 1–10','4:40–4:45 — trzymaj!'],['Km 10–30','4:37'],['Km 30–42','full send'],['Temperatura','~10–14°C'],['Gele','start · 7 · 14 · 21 · 30 km']],
+    laps:[
+      {n:'Km 1–10',pace:'4:40–4:45/km',hr:'~148–152',note:'kontrolowany start — tłum ciągnie, nie daj się'},
+      {n:'Km 10–21',pace:'4:37/km',hr:'~152–158',note:'buduj rytm'},
+      {n:'Km 21–30',pace:'4:37/km',hr:'~158–163',note:'utrzymaj'},
+      {n:'Km 30–42',pace:'all in',hr:'wszystko',note:'tu się decyduje 3:15'},
+    ],
+    feedback:'Tłum na starcie wciągnie — nie daj się. Pierwsze 10 km spokojnie, nawet jeśli czujesz się za dobrze. To pożyczka której nie oddasz. Buduj rytm od połowy. Londyn będzie chłodny — idealne warunki dla Ciebie.',
+    rules:[
+      {t:'Najważniejsza zasada',b:'Km 1 Londynu musi być wolniejszy niż km 40. Nie ma innej drogi do 3:15.'},
+      {t:'Twoja historia',b:'Tokyo 3:22 — spokojny start, silny finisz. Berlin 4:19 — za gorąco, za szybko, biodro. Londyn = Tokyo, nie Berlin.'}
+    ]
+  },
+];
+
+let selectedCol = null;
+
+function closeOverlay(){
+  document.getElementById('overlay').classList.remove('open');
+  if(selectedCol){selectedCol.classList.remove('selected');selectedCol=null;}
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
+
+function openOverlay(day){
+  const isRun = day.name && day.dist;
+  const isPlanned = day.planned && !isRun;
+
+  const title = isRun ? day.name : (day.planned || 'OFF');
+  const dateStr = day.date + (day.isToday ? ' — DZIŚ · Czwartek' : '');
+
+  document.getElementById('oTitle').textContent = title;
+  document.getElementById('oDate').textContent = dateStr;
+
+  // STATS
+  let sHtml = '';
+  if(isRun && day.stats){
+    sHtml += `<div class="stat-block"><div class="stat-block-title">Dane aktywności</div>`;
+    day.stats.forEach(([l,v])=>{
+      sHtml += `<div class="stat-row"><span class="stat-label">${l}</span><span class="stat-val">${v}</span></div>`;
+    });
+    sHtml += `</div>`;
+  }
+  if(isPlanned){
+    sHtml += `<div class="stat-block"><div class="stat-block-title">Plan</div>`;
+    sHtml += `<div class="stat-row"><span class="stat-label">Trening</span><span class="stat-val">${day.planned}</span></div>`;
+    if(day.detail) day.detail.split(' · ').forEach(d=>{
+      sHtml += `<div class="stat-row"><span class="stat-label"></span><span class="stat-val">${d}</span></div>`;
+    });
+    sHtml += `</div>`;
+  }
+  if(isRun && day.laps && day.laps.length > 0){
+    sHtml += `<div class="stat-block"><div class="stat-block-title">Splity</div>`;
+    sHtml += `<table class="laps-table"><thead><tr><th>Odcinek</th><th>Tempo</th><th>HR</th><th>Notatka</th></tr></thead><tbody>`;
+    day.laps.forEach(l=>{
+      const cls = (l.note&&(l.note.includes('MP')||l.note.includes('Interwał')||l.note.includes('finisz')))?'lap-key':'';
+      sHtml += `<tr><td class="${cls}">${l.n}</td><td class="${cls}">${l.pace}</td><td>${l.hr}</td><td style="color:var(--mid);font-size:10px">${l.note||''}</td></tr>`;
+    });
+    sHtml += `</tbody></table></div>`;
+  }
+  document.getElementById('oStats').innerHTML = sHtml;
+
+  // FEEDBACK
+  let fHtml = '';
+  if(day.feedback){
+    fHtml += `<div class="feedback-title">Feedback trenera</div><div class="feedback-text">${day.feedback}</div>`;
+    if(day.rules && day.rules.length > 0){
+      day.rules.forEach(r=>{
+        fHtml += `<div class="feedback-rule"><div class="feedback-rule-title">${r.t}</div><div class="feedback-rule-body">${r.b}</div></div>`;
+      });
+    }
+  } else if(isPlanned){
+    fHtml += `<div class="feedback-title">Wskazówki</div><div class="feedback-text">Zaplanowany trening. Wykonaj i wgraj dane ze Stravy — ocenię po fakcie.</div>`;
+  } else {
+    fHtml += `<div class="feedback-title">Dzień odpoczynku</div><div class="feedback-text">OFF. Nogi na górze, sen priorytetem. Nie kompensuj.</div>`;
+  }
+  document.getElementById('oFeedback').innerHTML = fHtml;
+
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function buildWeek(days, containerId){
+  const wd = document.getElementById(containerId);
+  days.forEach(day=>{
+    const col = document.createElement('div');
+    col.className = 'day-col' + (day.isToday ? ' today' : '');
+
+    const head = document.createElement('div');
+    head.className = 'day-head';
+    head.innerHTML = `<span>${day.day}</span><span class="day-date">${day.date}</span>`;
+    col.appendChild(head);
+
+    if(day.name && day.dist){
+      const body = document.createElement('div');
+      body.className = 'day-body';
+      const tagHtml = day.tag ? `<div><span class="tag tag-${day.tag}">${day.tagLabel}</span></div>` : '';
+      body.innerHTML = `<div class="day-name">${day.name}</div><div class="day-dist">${day.dist} km</div><div class="day-pace">${day.pace}/km</div><div class="day-hr">${day.hr ? 'HR '+day.hr : ''}</div>${tagHtml}`;
+      col.appendChild(body);
+    } else if(day.planned){
+      const body = document.createElement('div');
+      body.className = 'day-planned';
+      body.innerHTML = `<strong>${day.planned}</strong>` + (day.detail ? `<small>${day.detail}</small>` : '');
+      col.appendChild(body);
+    } else {
+      const body = document.createElement('div');
+      body.className = 'day-off';
+      body.textContent = 'OFF';
+      col.appendChild(body);
+    }
+
+    col.addEventListener('click', ()=>{
+      if(selectedCol) selectedCol.classList.remove('selected');
+      col.classList.add('selected');
+      selectedCol = col;
+      openOverlay(day);
+    });
+
+    wd.appendChild(col);
+  });
+}
+
+buildWeek(week0, 'wd0');
+buildWeek(week1, 'wd1');
+buildWeek(week2, 'wd2');
+
+// CHART
+const kmData = [
+  {w:'23.02–01.03', km:36.6},
+  {w:'02–08.03',    km:48.9},
+  {w:'09–15.03',    km:47.7},
+  {w:'16–22.03',    km:55.8},
+  {w:'23–30.03',    km:66.6},
+  {w:'31.03–06.04', km:77.2},
+  {w:'07–13.04',    km:64.2},
+  {w:'14–20.04',    km:32.6, partial:true},
+];
+new Chart(document.getElementById('kmChart'),{
+  type:'bar',
+  data:{
+    labels: kmData.map(d=>d.w),
+    datasets:[{
+      data: kmData.map(d=>d.km),
+      backgroundColor: kmData.map(d=>d.partial?'#ccc':'#0a0a0a'),
+      borderColor: kmData.map(d=>d.partial?'#aaa':'#0a0a0a'),
+      borderWidth:1,
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>ctx.parsed.y.toFixed(1)+' km'+(kmData[ctx.dataIndex].partial?' (w toku)':'')}}
+    },
+    scales:{
+      x:{ticks:{font:{size:9,family:'Courier Prime'},maxRotation:35,color:'#888',autoSkip:false},grid:{display:false}},
+      y:{min:0,max:90,ticks:{font:{size:9},stepSize:30,color:'#888'},grid:{color:'#e8e3da'}}
+    }
+  }
+});
+</script>
+</body>
+</html>

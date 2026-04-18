@@ -1,0 +1,18 @@
+{
+  "type": "run",
+  "name": "Czwartek czwartek",
+  "dist": 10.2,
+  "pace": "5:19",
+  "hr": "—",
+  "tag": "good",
+  "tagLabel": "Dobrze",
+  "stats": [
+    ["Dystans",  "10,2 km"],
+    ["Czas",     "54m 26s"],
+    ["Avg pace", "5:19/km"],
+    ["Typ",      "Easy czwartek"]
+  ],
+  "laps": [],
+  "feedback": "Easy czwartek trafiony — 10 km spokojnie po mocnej środzie. Dobra regeneracja przed weekendem.",
+  "rules": []
+}

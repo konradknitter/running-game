@@ -1,0 +1,39 @@
+{
+  "athlete": "Konrad Knitter",
+  "subtitle": "London Marathon 2026 — Taper Protocol",
+  "raceDate": "2026-04-26",
+  "raceDateLabel": "Nd 26.04.2026",
+  "prs": [
+    {"label": "Maraton PB",    "value": "3:22:32", "note": "Tokyo, marzec 2025"},
+    {"label": "Półmaraton PB", "value": "1:31:18", "note": "Montecatini, sty 2026"},
+    {"label": "10 km PB",      "value": "40:55",   "note": "MkCafe 2025"},
+    {"label": "Cel Londyn",    "value": "3:15",     "note": "target pace 4:37/km"}
+  ],
+  "paces": [
+    {"type": "Easy",          "val": "5:10–5:30"},
+    {"type": "MP Londyn",     "val": "4:35–4:40"},
+    {"type": "Threshold",     "val": "4:05–4:10"},
+    {"type": "Interwał 1 km", "val": "4:08–4:12"},
+    {"type": "Recovery",      "val": "5:40–6:00"}
+  ],
+  "notes": [
+    {
+      "title": "Taper — czego nie robić",
+      "body": "Nie nadrabiasz niczego. Forma jest tam gdzie jest. Nie gonisz tempa po wolnym km. Freshness &gt; hero workouts."
+    },
+    {
+      "title": "Logistyka Londyn",
+      "body": "Minimum chodzenia w pt i sb. Żadnej turystyki. Nogi na górze wieczorem. Expo: numer i wyjdź."
+    },
+    {
+      "title": "Strategia startowa",
+      "body": "Km 1–10: 4:40–4:45 — tłum wciągnie, nie daj się.<br>Km 10–30: 4:37 — buduj rytm.<br>Km 30–42: full send.<br>Gele: start · 7 · 14 · 21 · 30 km."
+    },
+    {
+      "title": "Warunki Londyn 26.04",
+      "body": "Prognoza ~10–14°C — idealne dla Ciebie. Zero ryzyka heat stress. Twój klimat. Pamiętaj o Berlinie i rób odwrotnie."
+    }
+  ],
+  "footerNote": "Dziś Czw: done · Pt OFF · So easy+strides · Nd 18km",
+  "coTrainer": "Konrad Co-Trainer"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "run",
+  "name": "Ploteczki Run",
+  "dist": 12.3,
+  "pace": "5:33",
+  "hr": "125",
+  "tag": "good",
+  "tagLabel": "Ideał",
+  "stats": [
+    ["Dystans",   "12,3 km"],
+    ["Czas",      "1h 8m"],
+    ["Avg pace",  "5:33/km"],
+    ["Avg HR",    "125 bpm"],
+    ["HR max",    "135 bpm"],
+    ["HR zakres", "111–135 bpm"],
+    ["Typ",       "Easy Z2 taper"]
+  ],
+  "laps": [
+    {"n": "km 1",    "pace": "5:34/km",       "hr": "111",     "note": "wolny start"},
+    {"n": "km 2–12", "pace": "5:20–5:38/km",  "hr": "121–132", "note": "czyste Z2"}
+  ],
+  "feedback": "Taper działa. HR 111–132 przez cały bieg, tempo spokojne. Idealny wtorek taperu — nogi spokojne, forma zbiera się w środku.",
+  "rules": []
+}

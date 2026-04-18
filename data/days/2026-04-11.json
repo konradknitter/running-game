@@ -1,0 +1,20 @@
+{
+  "type": "run",
+  "name": "Weird Relay",
+  "dist": 2.4,
+  "pace": "—",
+  "hr": "—",
+  "tag": "ok",
+  "tagLabel": "Neutral",
+  "stats": [
+    ["Dystans", "~2,4 km"],
+    ["Typ",     "Sprinty sztafetowe"],
+    ["Czas",    "~11 min łącznie"],
+    ["Efekt",   "Aktywacja NM"]
+  ],
+  "laps": [
+    {"n": "3 × ~800m sprint", "pace": "~3:00–3:30/km", "hr": "—", "note": "sztafeta z ekipą"}
+  ],
+  "feedback": "Krótkie sprinty sztafetowe — dobry bodziec nerwowo-mięśniowy przed LSD. Nie zaszkodził, wręcz przydatna aktywacja.",
+  "rules": []
+}

@@ -1,0 +1,34 @@
+{
+  "type": "run",
+  "name": "Mus to mus",
+  "dist": 13.1,
+  "pace": "4:58",
+  "hr": "152",
+  "tag": "ok",
+  "tagLabel": "Progresja MP",
+  "stats": [
+    ["Dystans",        "13,1 km"],
+    ["Czas",           "1h 5m"],
+    ["WU",             "3 km @ 5:43–5:58/km"],
+    ["MP segmenty",    "8×1 km @ 4:28–4:35/km"],
+    ["Avg HR na MP",   "~154 bpm"],
+    ["HR max",         "164 bpm"],
+    ["CD",             "2 km easy"]
+  ],
+  "laps": [
+    {"n": "WU 3 km",    "pace": "5:50/km", "hr": "115–122", "note": "rozgrzewka"},
+    {"n": "km 4",       "pace": "4:28/km", "hr": "146",     "note": "MP"},
+    {"n": "km 5",       "pace": "4:34/km", "hr": "150",     "note": "MP"},
+    {"n": "km 6",       "pace": "4:30/km", "hr": "152",     "note": "MP"},
+    {"n": "km 7",       "pace": "4:31/km", "hr": "154",     "note": "MP"},
+    {"n": "km 8",       "pace": "4:31/km", "hr": "156",     "note": "MP"},
+    {"n": "km 9",       "pace": "4:31/km", "hr": "157",     "note": "MP"},
+    {"n": "km 10",      "pace": "4:35/km", "hr": "159",     "note": "MP"},
+    {"n": "km 11",      "pace": "4:29/km", "hr": "160",     "note": "MP — finisz"},
+    {"n": "CD 2 km",    "pace": "5:28/km", "hr": "137",     "note": "cooldown"}
+  ],
+  "feedback": "Ukryty trening MP — 8 km @ 4:28–4:35 z HR 146–164. Tempo MP trzymane bez problemów, drift HR kontrolowany. Minusem jest bliskość do niedzielnego LSD, ale nogi wytrzymały. Bardzo dobry sygnał formy.",
+  "rules": [
+    {"t": "Wniosek pod Londyn", "b": "Tempo 4:28–4:35 przy HR 150–164 sugeruje że pace 4:37 to plan z zapasem — serce miało rezerwę."}
+  ]
+}

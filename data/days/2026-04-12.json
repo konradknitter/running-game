@@ -1,0 +1,31 @@
+{
+  "type": "run",
+  "name": "LSD + MP finish",
+  "dist": 24.2,
+  "pace": "5:16",
+  "hr": "140",
+  "tag": "good",
+  "tagLabel": "Kluczowy",
+  "stats": [
+    ["Dystans",              "24,2 km"],
+    ["Czas",                 "2h 7m"],
+    ["Avg pace",             "5:16/km"],
+    ["Avg HR",               "~140 bpm"],
+    ["Easy faza (17 km)",    "HR 117–145 · 5:16–5:43/km"],
+    ["MP segment (5 km)",    "4:29–4:35/km"],
+    ["HR na MP",             "155–165 bpm"]
+  ],
+  "laps": [
+    {"n": "km 1–17",  "pace": "5:20–5:43/km", "hr": "118–145", "note": "easy base"},
+    {"n": "km 18",    "pace": "4:33/km",       "hr": "155",     "note": "MP start"},
+    {"n": "km 19",    "pace": "4:34/km",       "hr": "157",     "note": "MP"},
+    {"n": "km 20",    "pace": "4:35/km",       "hr": "160",     "note": "MP"},
+    {"n": "km 21",    "pace": "4:31/km",       "hr": "164",     "note": "MP"},
+    {"n": "km 22",    "pace": "4:29/km",       "hr": "165",     "note": "MP — finisz"},
+    {"n": "km 23–24", "pace": "5:30/km",       "hr": "151",     "note": "cooldown"}
+  ],
+  "feedback": "Idealny ostatni LSD. 17 km czyste easy, potem 5 km @ 4:29–4:35 przy HR 155–165 — nogi odpowiedziały bez problemu. To był ostatni prawdziwy bodziec treningowy. Forma jest — teraz tylko świeżenie.",
+  "rules": [
+    {"t": "Wniosek pod Londyn", "b": "MP @ 4:29–4:35 przy HR 155–165 z rezerwą. Biodro nie protestowało. Forma jest tam gdzie powinna być."}
+  ]
+}

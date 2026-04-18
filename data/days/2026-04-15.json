@@ -1,0 +1,36 @@
+{
+  "type": "run",
+  "name": "Morning Track",
+  "dist": 10.2,
+  "pace": "5:01",
+  "hr": "↑170",
+  "tag": "warn",
+  "tagLabel": "Za ostro",
+  "stats": [
+    ["Dystans",            "10,2 km"],
+    ["Czas",               "51m 18s"],
+    ["WU",                 "2 km @ 6:40–6:57/km"],
+    ["Interwały",          "4×1 km"],
+    ["Faktyczne tempo",    "3:50–3:54/km"],
+    ["Planowane tempo",    "4:08–4:12/km"],
+    ["Delta",              "~15 sek/km za szybko"],
+    ["HR max",             "170 bpm"],
+    ["CD",                 "2 km @ 4:53–5:05/km"]
+  ],
+  "laps": [
+    {"n": "WU 2 km",      "pace": "6:50/km",       "hr": "114",     "note": "rozgrzewka"},
+    {"n": "Interwał 1",   "pace": "3:54/km",        "hr": "151–159", "note": "plan: 4:08–4:12"},
+    {"n": "Przerwa 90s",  "pace": "trucht",          "hr": "143–147", "note": ""},
+    {"n": "Interwał 2",   "pace": "3:52/km",        "hr": "158–163", "note": "plan: 4:08–4:12"},
+    {"n": "Przerwa 90s",  "pace": "trucht",          "hr": "147–148", "note": ""},
+    {"n": "Interwał 3",   "pace": "3:54/km",        "hr": "158–163", "note": "plan: 4:08–4:12"},
+    {"n": "Przerwa 90s",  "pace": "trucht",          "hr": "148–164", "note": ""},
+    {"n": "Interwał 4",   "pace": "3:46/km",        "hr": "162–170", "note": "najszybszy — za dużo"},
+    {"n": "CD 2 km",      "pace": "4:53–5:05/km",   "hr": "138–152", "note": "cooldown"}
+  ],
+  "feedback": "Forma jest — te czasy mówią głośno. Ale 15 sek/km ponad plan w środku taperu to za wysoki koszt nerwowo-mięśniowy. HR do 170 na 4. interwale. Czwartek był koniecznością, nie wyborem.",
+  "rules": [
+    {"t": "Wniosek pozytywny", "b": "3:46–3:54/km przy HR 163–170 potwierdza dobrą formę szybkościową przed startem."},
+    {"t": "Ryzyko",            "b": "W race week środa: 4×600m rytmowo — nie powtarzaj tego błędu."}
+  ]
+}

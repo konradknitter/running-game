@@ -1,0 +1,26 @@
+{
+  "type": "run",
+  "name": "Zone 2 Day",
+  "dist": 14.1,
+  "pace": "5:40",
+  "hr": "125",
+  "tag": "good",
+  "tagLabel": "Ideał",
+  "stats": [
+    ["Dystans",   "14,1 km"],
+    ["Czas",      "1h 19m"],
+    ["Avg pace",  "5:40/km"],
+    ["Avg HR",    "125 bpm"],
+    ["HR zakres", "116–132 bpm"],
+    ["Typ",       "Easy Z2"]
+  ],
+  "laps": [
+    {"n": "km 1–3",   "pace": "5:44/km", "hr": "117–122", "note": "wolny start"},
+    {"n": "km 4–11",  "pace": "5:37/km", "hr": "122–131", "note": "Z2 steady"},
+    {"n": "km 12–14", "pace": "5:34/km", "hr": "126–132", "note": "finish"}
+  ],
+  "feedback": "Perfekcyjny bieg. HR 116–132 przez cały czas — czyste Z2. Taka objętość przy takim HR to dokładnie co trzeba tydzień przed ostatnim LSD. Żadnych skoków, żadnego dryftu.",
+  "rules": [
+    {"t": "Co to oznacza", "b": "Baza tlenowa działa. Nogi gotowe na mocniejszy bodziec."}
+  ]
+}

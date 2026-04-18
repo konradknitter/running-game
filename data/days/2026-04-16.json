@@ -1,0 +1,26 @@
+{
+  "type": "run",
+  "name": "Czwartek to prawie piątek",
+  "dist": 10.1,
+  "pace": "5:34",
+  "hr": "128",
+  "tag": "good",
+  "tagLabel": "Ideał",
+  "stats": [
+    ["Dystans",   "10,1 km"],
+    ["Czas",      "55m 58s"],
+    ["Avg pace",  "5:34/km"],
+    ["Avg HR",    "128 bpm"],
+    ["HR max",    "141 bpm"],
+    ["HR zakres", "116–141 bpm"],
+    ["Typ",       "Easy — absorpcja po środzie"]
+  ],
+  "laps": [
+    {"n": "km 1",    "pace": "5:51/km",      "hr": "116",     "note": "bardzo wolny start"},
+    {"n": "km 2–10", "pace": "5:23–5:41/km", "hr": "122–134", "note": "Z2 steady"}
+  ],
+  "feedback": "Perfekcyjna odpowiedź na ostrą środę. HR 115–134 przez 90% biegu, max 141. Nogi regenerują się normalnie. Taper przebiega prawidłowo.",
+  "rules": [
+    {"t": "Aktualny stan", "b": "Trzy dni taperu za Tobą. Nogi spokojne, forma się kumuluje. Jutro OFF — priorytet sen."}
+  ]
+}

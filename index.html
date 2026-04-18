@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Konrad — London Taper</title>
+<title>Konrad — Running Dashboard</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Bebas+Neue&display=swap');
 :root{--ink:#0a0a0a;--paper:#f5f0e8;--mid:#888;--rule:#ccc;--dim:#e0dbd0;--sel:#d0cbc1;}
@@ -95,92 +95,107 @@ body{background:var(--paper);color:var(--ink);font-family:'Courier Prime',monosp
 .note-body{font-size:10px;color:var(--mid);line-height:1.5;}
 
 .footer{margin-top:14px;padding-top:6px;border-top:1px solid var(--rule);font-size:9px;color:var(--mid);display:flex;justify-content:space-between;text-transform:uppercase;letter-spacing:1px;}
+
+/* ── Base grid fixes: allow cells to shrink below min-content ────────────── */
+.prs{grid-template-columns:repeat(4,minmax(0,1fr));}
+.week-days{grid-template-columns:repeat(7,minmax(0,1fr));}
+.day-col{min-width:0;}
+.day-name{overflow-wrap:break-word;word-break:break-word;}
+.pace-ref{grid-template-columns:repeat(5,minmax(0,1fr));}
+.week-title{flex-wrap:wrap;gap:2px;}
+.week-days-scroll{width:100%;}
+
+/* ── E-ink tablet / narrow viewport (≤ 900px) ───────────────────────────── */
+@media(max-width:900px){
+  body{padding:14px 16px;}
+  .header-name{font-size:30px;}
+  .countdown{font-size:40px;}
+  .pr-value{font-size:18px;}
+}
+
+/* ── Mobile / small tablet (≤ 599px) ────────────────────────────────────── */
+@media(max-width:599px){
+  body{padding:10px 12px;font-size:12px;}
+
+  /* Header: stack countdown below name */
+  .header{flex-direction:column;align-items:flex-start;gap:6px;border-bottom-width:2px;}
+  .header-name{font-size:28px;}
+  .countdown{text-align:left;font-size:38px;}
+  .countdown-label{text-align:left;}
+
+  /* PRs: 2 × 2 */
+  .prs{grid-template-columns:repeat(2,1fr);}
+  .pr-cell:nth-child(2){border-right:none;}
+  .pr-cell:nth-child(3){border-top:1px solid var(--ink);}
+  .pr-cell:nth-child(4){border-top:1px solid var(--ink);border-right:none;}
+
+  /* Week days: one row per day instead of horizontal scroll */
+  .week-days{display:flex;flex-direction:column;}
+  .day-col{display:flex;flex-direction:row;align-items:stretch;border-right:none;border-bottom:1px solid var(--rule);min-height:0;}
+  .day-col:last-child{border-bottom:none;}
+  .day-head{flex-direction:column;justify-content:center;align-items:flex-start;width:56px;min-width:56px;flex-shrink:0;border-bottom:none;border-right:1px solid var(--rule);padding:8px 7px;}
+  .day-date{display:block;margin-top:2px;}
+  .day-body{flex:1;padding:6px 8px;}
+  .day-off{flex:1;padding:8px 8px;display:flex;align-items:center;}
+  .day-planned{flex:1;padding:6px 8px;}
+  .day-dist{font-size:15px;}
+
+  /* Overlay: single column */
+  .overlay-inner{padding:16px 14px 36px;}
+  .overlay-close{top:12px;right:14px;}
+  .overlay-title{font-size:28px;}
+  .overlay-grid{grid-template-columns:1fr;gap:20px;}
+
+  /* Pace ref: 3 + 2 wrap */
+  .pace-ref{grid-template-columns:repeat(3,1fr);}
+  .pace-cell:nth-child(3){border-right:none;}
+  .pace-cell:nth-child(4){border-top:1px solid var(--rule);}
+  .pace-cell:nth-child(5){border-top:1px solid var(--rule);border-right:none;}
+
+  /* Notes: single column */
+  .notes-grid{grid-template-columns:1fr;}
+
+  /* Footer: stacked */
+  .footer{flex-direction:column;gap:4px;}
+}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div>
-    <div class="header-name">Konrad Knitter</div>
-    <div class="header-sub">London Marathon 2026 — Taper Protocol</div>
+    <div class="header-name" id="hName"></div>
+    <div class="header-sub"  id="hSub"></div>
   </div>
   <div>
-    <div class="countdown">10</div>
-    <div class="countdown-label">dni do startu · Nd 26.04.2026</div>
+    <div class="countdown"       id="hCountdown"></div>
+    <div class="countdown-label" id="hCountdownLabel"></div>
   </div>
 </div>
 
-<div class="prs">
-  <div class="pr-cell"><div class="pr-label">Maraton PB</div><div class="pr-value">3:22:32</div><div class="pr-note">Tokyo, marzec 2025</div></div>
-  <div class="pr-cell"><div class="pr-label">Półmaraton PB</div><div class="pr-value">1:31:18</div><div class="pr-note">Montecatini, sty 2026</div></div>
-  <div class="pr-cell"><div class="pr-label">10 km PB</div><div class="pr-value">40:55</div><div class="pr-note">MkCafe 2025</div></div>
-  <div class="pr-cell"><div class="pr-label">Cel Londyn</div><div class="pr-value">3:15</div><div class="pr-note">target pace 4:37/km</div></div>
-</div>
+<div class="prs" id="prs"></div>
 
-<div class="section-head">Kilometraż — ostatnie 8 tygodni</div>
+<div class="section-head">Kilometraż — ostatnie tygodnie</div>
 <div class="chart-wrap">
-  <canvas id="kmChart" role="img" aria-label="Kilometraż tygodniowy 8 tygodni">37, 49, 48, 56, 67, 77, 64, 32 km.</canvas>
+  <canvas id="kmChart" role="img" aria-label="Kilometraż tygodniowy"></canvas>
 </div>
 
-<div class="section-head">Poprzedni tydzień · Pn 06.04 — Nd 12.04.2026</div>
-<div class="week-block">
-  <div class="week-title"><span>06–12 Kwi 2026</span><span class="week-km">64,2 km</span></div>
-  <div class="week-days" id="wd0"></div>
-</div>
-
-<div class="section-head">Bieżący tydzień · Pn 13.04 — Nd 19.04.2026</div>
-<div class="week-block">
-  <div class="week-title"><span>13–19 Kwi 2026</span><span class="week-km">32,6 km <span>/ ~58 km plan</span></span></div>
-  <div class="week-days" id="wd1"></div>
-</div>
-
-<div class="section-head">Race Week · Pn 20.04 — Nd 26.04.2026</div>
-<div class="week-block">
-  <div class="week-title"><span>20–26 Kwi 2026 — LONDON MARATHON</span><span class="week-km">~66 km <span>plan (incl. 42,2)</span></span></div>
-  <div class="week-days" id="wd2"></div>
-</div>
+<div id="weeksContainer"></div>
 
 <div class="section-head">Tempa referencyjne</div>
-<div class="pace-ref">
-  <div class="pace-cell"><div class="pace-type">Easy</div><div class="pace-val">5:10–5:30</div></div>
-  <div class="pace-cell"><div class="pace-type">MP Londyn</div><div class="pace-val">4:35–4:40</div></div>
-  <div class="pace-cell"><div class="pace-type">Threshold</div><div class="pace-val">4:05–4:10</div></div>
-  <div class="pace-cell"><div class="pace-type">Interwał 1 km</div><div class="pace-val">4:08–4:12</div></div>
-  <div class="pace-cell"><div class="pace-type">Recovery</div><div class="pace-val">5:40–6:00</div></div>
-</div>
+<div class="pace-ref" id="paceRef"></div>
 
 <div class="section-head">Zasady i porady</div>
-<div class="notes-grid">
-  <div class="note-row">
-    <div class="note-title">Taper — czego nie robić</div>
-    <div class="note-body">Nie nadrabiasz niczego. Forma jest tam gdzie jest. Nie gonisz tempa po wolnym km. Freshness &gt; hero workouts.</div>
-  </div>
-  <div class="note-row">
-    <div class="note-title">Logistyka Londyn</div>
-    <div class="note-body">Minimum chodzenia w pt i sb. Żadnej turystyki. Nogi na górze wieczorem. Expo: numer i wyjdź.</div>
-  </div>
-  <div class="note-row">
-    <div class="note-title">Strategia startowa</div>
-    <div class="note-body">Km 1–10: 4:40–4:45 — tłum wciągnie, nie daj się.<br>Km 10–30: 4:37 — buduj rytm.<br>Km 30–42: full send.<br>Gele: start · 7 · 14 · 21 · 30 km.</div>
-  </div>
-  <div class="note-row">
-    <div class="note-title">Warunki Londyn 26.04</div>
-    <div class="note-body">Prognoza ~10–14°C — idealne dla Ciebie. Zero ryzyka heat stress. Twój klimat. Pamiętaj o Berlinie i rób odwrotnie.</div>
-  </div>
-</div>
+<div class="notes-grid" id="notesGrid"></div>
 
-<div class="footer">
-  <span>Aktualizacja: Czw 16.04.2026</span>
-  <span>Dziś Czw: done · Pt OFF · So easy+strides · Nd 18km</span>
-  <span>Konrad Co-Trainer</span>
-</div>
+<div class="footer" id="footer"></div>
 
 <!-- OVERLAY -->
 <div class="overlay" id="overlay">
   <button class="overlay-close" onclick="closeOverlay()">✕ ZAMKNIJ</button>
   <div class="overlay-inner">
     <div class="overlay-title" id="oTitle"></div>
-    <div class="overlay-date" id="oDate"></div>
+    <div class="overlay-date"  id="oDate"></div>
     <div style="margin-top:20px;" class="overlay-grid">
       <div id="oStats"></div>
       <div id="oFeedback"></div>
@@ -190,203 +205,98 @@ body{background:var(--paper);color:var(--ink);font-family:'Courier Prime',monosp
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-// WEEK 0: Pn 06.04 – Nd 12.04
-// Apr 6=Pn, 7=Wt, 8=Sr, 9=Czw, 10=Pt, 11=So, 12=Nd
-const week0 = [
-  {day:'Pn', date:'06.04', done:true},
-  {day:'Wt', date:'07.04', done:true,
-    name:'Zone 2 Day', dist:14.1, pace:'5:40', hr:'125', tag:'good', tagLabel:'Ideał',
-    stats:[['Dystans','14,1 km'],['Czas','1h 19m'],['Avg pace','5:40/km'],['Avg HR','125 bpm'],['HR zakres','116–132 bpm'],['Typ','Easy Z2']],
-    laps:[
-      {n:'km 1–3',pace:'5:44/km',hr:'117–122',note:'wolny start'},
-      {n:'km 4–11',pace:'5:37/km',hr:'122–131',note:'Z2 steady'},
-      {n:'km 12–14',pace:'5:34/km',hr:'126–132',note:'finish'},
-    ],
-    feedback:'Perfekcyjny bieg. HR 116–132 przez cały czas — czyste Z2. Taka objętość przy takim HR to dokładnie co trzeba tydzień przed ostatnim LSD. Żadnych skoków, żadnego dryftu.',
-    rules:[{t:'Co to oznacza',b:'Baza tlenowa działa. Nogi gotowe na mocniejszy bodziec.'}]
-  },
-  {day:'Śr', date:'08.04', done:true,
-    name:'Mus to mus', dist:13.1, pace:'4:58', hr:'152', tag:'ok', tagLabel:'Progresja MP',
-    stats:[['Dystans','13,1 km'],['Czas','1h 5m'],['WU','3 km @ 5:43–5:58/km'],['MP segmenty','8×1 km @ 4:28–4:35/km'],['Avg HR na MP','~154 bpm'],['HR max','164 bpm'],['CD','2 km easy']],
-    laps:[
-      {n:'WU 3 km',pace:'5:50/km',hr:'115–122',note:'rozgrzewka'},
-      {n:'km 4',pace:'4:28/km',hr:'146',note:'MP'},
-      {n:'km 5',pace:'4:34/km',hr:'150',note:'MP'},
-      {n:'km 6',pace:'4:30/km',hr:'152',note:'MP'},
-      {n:'km 7',pace:'4:31/km',hr:'154',note:'MP'},
-      {n:'km 8',pace:'4:31/km',hr:'156',note:'MP'},
-      {n:'km 9',pace:'4:31/km',hr:'157',note:'MP'},
-      {n:'km 10',pace:'4:35/km',hr:'159',note:'MP'},
-      {n:'km 11',pace:'4:29/km',hr:'160',note:'MP — finisz'},
-      {n:'CD 2 km',pace:'5:28/km',hr:'137',note:'cooldown'},
-    ],
-    feedback:'Ukryty trening MP — 8 km @ 4:28–4:35 z HR 146–164. Tempo MP trzymane bez problemów, drift HR kontrolowany. Minusem jest bliskość do niedzielnego LSD, ale nogi wytrzymały. Bardzo dobry sygnał formy.',
-    rules:[{t:'Wniosek pod Londyn',b:'Tempo 4:28–4:35 przy HR 150–164 sugeruje że pace 4:37 to plan z zapasem — serce miało rezerwę.'}]
-  },
-  {day:'Czw', date:'09.04', done:true,
-    name:'Czwartek czwartek', dist:10.2, pace:'5:19', hr:'—', tag:'good', tagLabel:'Dobrze',
-    stats:[['Dystans','10,2 km'],['Czas','54m 26s'],['Avg pace','5:19/km'],['Typ','Easy czwartek']],
-    laps:[],
-    feedback:'Easy czwartek trafiony — 10 km spokojnie po mocnej środzie. Dobra regeneracja przed weekendem.',
-    rules:[]
-  },
-  {day:'Pt', date:'10.04', done:true},
-  {day:'So', date:'11.04', done:true,
-    name:'Weird Relay', dist:2.4, pace:'—', hr:'—', tag:'ok', tagLabel:'Neutral',
-    stats:[['Dystans','~2,4 km'],['Typ','Sprinty sztafetowe'],['Czas','~11 min łącznie'],['Efekt','Aktywacja NM']],
-    laps:[{n:'3 × ~800m sprint',pace:'~3:00–3:30/km',hr:'—',note:'sztafeta z ekipą'}],
-    feedback:'Krótkie sprinty sztafetowe — dobry bodziec nerwowo-mięśniowy przed LSD. Nie zaszkodził, wręcz przydatna aktywacja.',
-    rules:[]
-  },
-  {day:'Nd', date:'12.04', done:true,
-    name:'LSD + MP finish', dist:24.2, pace:'5:16', hr:'140', tag:'good', tagLabel:'Kluczowy',
-    stats:[['Dystans','24,2 km'],['Czas','2h 7m'],['Avg pace','5:16/km'],['Avg HR','~140 bpm'],['Easy faza (17 km)','HR 117–145 · 5:16–5:43/km'],['MP segment (5 km)','4:29–4:35/km'],['HR na MP','155–165 bpm']],
-    laps:[
-      {n:'km 1–17',pace:'5:20–5:43/km',hr:'118–145',note:'easy base'},
-      {n:'km 18',pace:'4:33/km',hr:'155',note:'MP start'},
-      {n:'km 19',pace:'4:34/km',hr:'157',note:'MP'},
-      {n:'km 20',pace:'4:35/km',hr:'160',note:'MP'},
-      {n:'km 21',pace:'4:31/km',hr:'164',note:'MP'},
-      {n:'km 22',pace:'4:29/km',hr:'165',note:'MP — finisz'},
-      {n:'km 23–24',pace:'5:30/km',hr:'151',note:'cooldown'},
-    ],
-    feedback:'Idealny ostatni LSD. 17 km czyste easy, potem 5 km @ 4:29–4:35 przy HR 155–165 — nogi odpowiedziały bez problemu. To był ostatni prawdziwy bodziec treningowy. Forma jest — teraz tylko świeżenie.',
-    rules:[{t:'Wniosek pod Londyn',b:'MP @ 4:29–4:35 przy HR 155–165 z rezerwą. Biodro nie protestowało. Forma jest tam gdzie powinna być.'}]
-  },
-];
+const DAYS_PL = ['Nd','Pn','Wt','Śr','Czw','Pt','So'];
 
-// WEEK 1: Pn 13.04 – Nd 19.04
-// Apr 13=Pn, 14=Wt, 15=Sr, 16=Czw(DZIŚ), 17=Pt, 18=So, 19=Nd
-const week1 = [
-  {day:'Pn', date:'13.04', done:true},
-  {day:'Wt', date:'14.04', done:true,
-    name:'Ploteczki Run', dist:12.3, pace:'5:33', hr:'125', tag:'good', tagLabel:'Ideał',
-    stats:[['Dystans','12,3 km'],['Czas','1h 8m'],['Avg pace','5:33/km'],['Avg HR','125 bpm'],['HR max','135 bpm'],['HR zakres','111–135 bpm'],['Typ','Easy Z2 taper']],
-    laps:[
-      {n:'km 1',pace:'5:34/km',hr:'111',note:'wolny start'},
-      {n:'km 2–12',pace:'5:20–5:38/km',hr:'121–132',note:'czyste Z2'},
-    ],
-    feedback:'Taper działa. HR 111–132 przez cały bieg, tempo spokojne. Idealny wtorek taperu — nogi spokojne, forma zbiera się w środku.',
-    rules:[]
-  },
-  {day:'Śr', date:'15.04', done:true,
-    name:'Morning Track', dist:10.2, pace:'5:01', hr:'↑170', tag:'warn', tagLabel:'Za ostro',
-    stats:[['Dystans','10,2 km'],['Czas','51m 18s'],['WU','2 km @ 6:40–6:57/km'],['Interwały','4×1 km'],['Faktyczne tempo','3:50–3:54/km'],['Planowane tempo','4:08–4:12/km'],['Delta','~15 sek/km za szybko'],['HR max','170 bpm'],['CD','2 km @ 4:53–5:05/km']],
-    laps:[
-      {n:'WU 2 km',pace:'6:50/km',hr:'114',note:'rozgrzewka'},
-      {n:'Interwał 1',pace:'3:54/km',hr:'151–159',note:'plan: 4:08–4:12'},
-      {n:'Przerwa 90s',pace:'trucht',hr:'143–147',note:''},
-      {n:'Interwał 2',pace:'3:52/km',hr:'158–163',note:'plan: 4:08–4:12'},
-      {n:'Przerwa 90s',pace:'trucht',hr:'147–148',note:''},
-      {n:'Interwał 3',pace:'3:54/km',hr:'158–163',note:'plan: 4:08–4:12'},
-      {n:'Przerwa 90s',pace:'trucht',hr:'148–164',note:''},
-      {n:'Interwał 4',pace:'3:46/km',hr:'162–170',note:'najszybszy — za dużo'},
-      {n:'CD 2 km',pace:'4:53–5:05/km',hr:'138–152',note:'cooldown'},
-    ],
-    feedback:'Forma jest — te czasy mówią głośno. Ale 15 sek/km ponad plan w środku taperu to za wysoki koszt nerwowo-mięśniowy. HR do 170 na 4. interwale. Czwartek był koniecznością, nie wyborem.',
-    rules:[
-      {t:'Wniosek pozytywny',b:'3:46–3:54/km przy HR 163–170 potwierdza dobrą formę szybkościową przed startem.'},
-      {t:'Ryzyko',b:'W race week środa: 4×600m rytmowo — nie powtarzaj tego błędu.'}
-    ]
-  },
-  {day:'Czw', date:'16.04', done:true, isToday:true,
-    name:'Czwartek to prawie piątek', dist:10.1, pace:'5:34', hr:'128', tag:'good', tagLabel:'Ideał',
-    stats:[['Dystans','10,1 km'],['Czas','55m 58s'],['Avg pace','5:34/km'],['Avg HR','128 bpm'],['HR max','141 bpm'],['HR zakres','116–141 bpm'],['Typ','Easy — absorpcja po środzie']],
-    laps:[
-      {n:'km 1',pace:'5:51/km',hr:'116',note:'bardzo wolny start'},
-      {n:'km 2–10',pace:'5:23–5:41/km',hr:'122–134',note:'Z2 steady'},
-    ],
-    feedback:'Perfekcyjna odpowiedź na ostrą środę. HR 115–134 przez 90% biegu, max 141. Nogi regenerują się normalnie. Taper przebiega prawidłowo.',
-    rules:[{t:'Aktualny stan',b:'Trzy dni taperu za Tobą. Nogi spokojne, forma się kumuluje. Jutro OFF — priorytet sen.'}]
-  },
-  {day:'Pt', date:'17.04', planned:'OFF', detail:'Pełny odpoczynek · sen priorytetem'},
-  {day:'So', date:'18.04', planned:'6–8 km easy', detail:'+ 4–6 strides 20s · swobodnie'},
-  {day:'Nd', date:'19.04', planned:'18 km', detail:'14–15 km easy + 3 km @ 4:35–4:40 · dolna granica!'},
-];
+function getDayName(dateStr) {
+  return DAYS_PL[new Date(dateStr + 'T12:00:00').getDay()];
+}
 
-// WEEK 2: Pn 20.04 – Nd 26.04
-// Apr 20=Pn, 21=Wt, 22=Sr, 23=Czw, 24=Pt, 25=So, 26=Nd=MARATHON
-const week2 = [
-  {day:'Pn', date:'20.04', planned:'OFF'},
-  {day:'Wt', date:'21.04', planned:'8–10 km easy', detail:'5:10–5:30/km · lekko'},
-  {day:'Śr', date:'22.04', planned:'4×600 m', detail:'2 km WU + trucht + 2 km CD · rytm nie zgon'},
-  {day:'Czw', date:'23.04', planned:'8 km easy', detail:'Ostatni normalny bieg'},
-  {day:'Pt', date:'24.04', planned:'OFF', detail:'Przylot · nogi na górze wieczorem'},
-  {day:'So', date:'25.04', planned:'20–25 min easy', detail:'+ 4 strides · żadnej turystyki!'},
-  {day:'Nd', date:'26.04',
-    name:'LONDON MARATHON', dist:42.2, pace:'4:37 cel', hr:'—', tag:'race', tagLabel:'RACE',
-    stats:[['Dystans','42,195 km'],['Cel','3:15:00'],['Target pace','4:37/km'],['Km 1–10','4:40–4:45 — trzymaj!'],['Km 10–30','4:37'],['Km 30–42','full send'],['Temperatura','~10–14°C'],['Gele','start · 7 · 14 · 21 · 30 km']],
-    laps:[
-      {n:'Km 1–10',pace:'4:40–4:45/km',hr:'~148–152',note:'kontrolowany start — tłum ciągnie, nie daj się'},
-      {n:'Km 10–21',pace:'4:37/km',hr:'~152–158',note:'buduj rytm'},
-      {n:'Km 21–30',pace:'4:37/km',hr:'~158–163',note:'utrzymaj'},
-      {n:'Km 30–42',pace:'all in',hr:'wszystko',note:'tu się decyduje 3:15'},
-    ],
-    feedback:'Tłum na starcie wciągnie — nie daj się. Pierwsze 10 km spokojnie, nawet jeśli czujesz się za dobrze. To pożyczka której nie oddasz. Buduj rytm od połowy. Londyn będzie chłodny — idealne warunki dla Ciebie.',
-    rules:[
-      {t:'Najważniejsza zasada',b:'Km 1 Londynu musi być wolniejszy niż km 40. Nie ma innej drogi do 3:15.'},
-      {t:'Twoja historia',b:'Tokyo 3:22 — spokojny start, silny finisz. Berlin 4:19 — za gorąco, za szybko, biodro. Londyn = Tokyo, nie Berlin.'}
-    ]
-  },
-];
+function getDisplayDate(dateStr) {
+  const [, m, d] = dateStr.split('-');
+  return `${d}.${m}`;
+}
 
+function isToday(dateStr) {
+  const t = new Date(), d = new Date(dateStr + 'T12:00:00');
+  return t.toDateString() === d.toDateString();
+}
+
+function getDaysToRace(raceDateStr) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  return Math.max(0, Math.round((new Date(raceDateStr + 'T00:00:00') - now) / 86400000));
+}
+
+function getWeekDates(startStr) {
+  const start = new Date(startStr + 'T12:00:00');
+  return Array.from({length: 7}, (_, i) => {
+    const d = new Date(start);
+    d.setDate(d.getDate() + i);
+    return d.toISOString().split('T')[0];
+  });
+}
+
+async function fetchDay(dateStr) {
+  try {
+    const r = await fetch(`data/days/${dateStr}.json`);
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+
+// ── Overlay ──────────────────────────────────────────────────────────────────
 let selectedCol = null;
 
-function closeOverlay(){
+function closeOverlay() {
   document.getElementById('overlay').classList.remove('open');
-  if(selectedCol){selectedCol.classList.remove('selected');selectedCol=null;}
-  document.body.style.overflow='';
+  if (selectedCol) { selectedCol.classList.remove('selected'); selectedCol = null; }
+  document.body.style.overflow = '';
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
 
-function openOverlay(day){
-  const isRun = day.name && day.dist;
-  const isPlanned = day.planned && !isRun;
-
-  const title = isRun ? day.name : (day.planned || 'OFF');
-  const dateStr = day.date + (day.isToday ? ' — DZIŚ · Czwartek' : '');
+function openOverlay(day) {
+  const isRun      = day.type === 'run';
+  const isPlanned  = day.type === 'planned';
+  const title      = isRun ? day.name : (day.planned || 'OFF');
+  const dateLabel  = day.displayDate + (day.isToday ? ' — DZIŚ' : '');
 
   document.getElementById('oTitle').textContent = title;
-  document.getElementById('oDate').textContent = dateStr;
+  document.getElementById('oDate').textContent  = dateLabel;
 
-  // STATS
+  // Stats panel
   let sHtml = '';
-  if(isRun && day.stats){
+  if (isRun && day.stats) {
     sHtml += `<div class="stat-block"><div class="stat-block-title">Dane aktywności</div>`;
-    day.stats.forEach(([l,v])=>{
+    day.stats.forEach(([l, v]) => {
       sHtml += `<div class="stat-row"><span class="stat-label">${l}</span><span class="stat-val">${v}</span></div>`;
     });
     sHtml += `</div>`;
   }
-  if(isPlanned){
+  if (isPlanned) {
     sHtml += `<div class="stat-block"><div class="stat-block-title">Plan</div>`;
     sHtml += `<div class="stat-row"><span class="stat-label">Trening</span><span class="stat-val">${day.planned}</span></div>`;
-    if(day.detail) day.detail.split(' · ').forEach(d=>{
+    if (day.detail) day.detail.split(' · ').forEach(d => {
       sHtml += `<div class="stat-row"><span class="stat-label"></span><span class="stat-val">${d}</span></div>`;
     });
     sHtml += `</div>`;
   }
-  if(isRun && day.laps && day.laps.length > 0){
+  if (isRun && day.laps && day.laps.length > 0) {
     sHtml += `<div class="stat-block"><div class="stat-block-title">Splity</div>`;
     sHtml += `<table class="laps-table"><thead><tr><th>Odcinek</th><th>Tempo</th><th>HR</th><th>Notatka</th></tr></thead><tbody>`;
-    day.laps.forEach(l=>{
-      const cls = (l.note&&(l.note.includes('MP')||l.note.includes('Interwał')||l.note.includes('finisz')))?'lap-key':'';
-      sHtml += `<tr><td class="${cls}">${l.n}</td><td class="${cls}">${l.pace}</td><td>${l.hr}</td><td style="color:var(--mid);font-size:10px">${l.note||''}</td></tr>`;
+    day.laps.forEach(l => {
+      const cls = (l.note && (l.note.includes('MP') || l.note.includes('Interwał') || l.note.includes('finisz'))) ? 'lap-key' : '';
+      sHtml += `<tr><td class="${cls}">${l.n}</td><td class="${cls}">${l.pace}</td><td>${l.hr}</td><td style="color:var(--mid);font-size:10px">${l.note || ''}</td></tr>`;
     });
     sHtml += `</tbody></table></div>`;
   }
   document.getElementById('oStats').innerHTML = sHtml;
 
-  // FEEDBACK
+  // Feedback panel
   let fHtml = '';
-  if(day.feedback){
+  if (day.feedback) {
     fHtml += `<div class="feedback-title">Feedback trenera</div><div class="feedback-text">${day.feedback}</div>`;
-    if(day.rules && day.rules.length > 0){
-      day.rules.forEach(r=>{
-        fHtml += `<div class="feedback-rule"><div class="feedback-rule-title">${r.t}</div><div class="feedback-rule-body">${r.b}</div></div>`;
-      });
-    }
-  } else if(isPlanned){
+    (day.rules || []).forEach(r => {
+      fHtml += `<div class="feedback-rule"><div class="feedback-rule-title">${r.t}</div><div class="feedback-rule-body">${r.b}</div></div>`;
+    });
+  } else if (isPlanned) {
     fHtml += `<div class="feedback-title">Wskazówki</div><div class="feedback-text">Zaplanowany trening. Wykonaj i wgraj dane ze Stravy — ocenię po fakcie.</div>`;
   } else {
     fHtml += `<div class="feedback-title">Dzień odpoczynku</div><div class="feedback-text">OFF. Nogi na górze, sen priorytetem. Nie kompensuj.</div>`;
@@ -397,84 +307,150 @@ function openOverlay(day){
   document.body.style.overflow = 'hidden';
 }
 
-function buildWeek(days, containerId){
-  const wd = document.getElementById(containerId);
-  days.forEach(day=>{
-    const col = document.createElement('div');
-    col.className = 'day-col' + (day.isToday ? ' today' : '');
+// ── Day column builder ────────────────────────────────────────────────────────
+function buildDayCol(dateStr, dayData) {
+  const col         = document.createElement('div');
+  const today       = isToday(dateStr);
+  col.className     = 'day-col' + (today ? ' today' : '');
 
-    const head = document.createElement('div');
-    head.className = 'day-head';
-    head.innerHTML = `<span>${day.day}</span><span class="day-date">${day.date}</span>`;
-    col.appendChild(head);
+  const dayName     = getDayName(dateStr);
+  const displayDate = getDisplayDate(dateStr);
 
-    if(day.name && day.dist){
-      const body = document.createElement('div');
-      body.className = 'day-body';
-      const tagHtml = day.tag ? `<div><span class="tag tag-${day.tag}">${day.tagLabel}</span></div>` : '';
-      body.innerHTML = `<div class="day-name">${day.name}</div><div class="day-dist">${day.dist} km</div><div class="day-pace">${day.pace}/km</div><div class="day-hr">${day.hr ? 'HR '+day.hr : ''}</div>${tagHtml}`;
-      col.appendChild(body);
-    } else if(day.planned){
-      const body = document.createElement('div');
-      body.className = 'day-planned';
-      body.innerHTML = `<strong>${day.planned}</strong>` + (day.detail ? `<small>${day.detail}</small>` : '');
-      col.appendChild(body);
-    } else {
-      const body = document.createElement('div');
-      body.className = 'day-off';
-      body.textContent = 'OFF';
-      col.appendChild(body);
-    }
+  const head        = document.createElement('div');
+  head.className    = 'day-head';
+  head.innerHTML    = `<span>${dayName}</span><span class="day-date">${displayDate}</span>`;
+  col.appendChild(head);
 
-    col.addEventListener('click', ()=>{
-      if(selectedCol) selectedCol.classList.remove('selected');
-      col.classList.add('selected');
-      selectedCol = col;
-      openOverlay(day);
-    });
+  if (dayData && dayData.type === 'run') {
+    const body     = document.createElement('div');
+    body.className = 'day-body';
+    const tagHtml  = dayData.tag ? `<div><span class="tag tag-${dayData.tag}">${dayData.tagLabel}</span></div>` : '';
+    body.innerHTML = `<div class="day-name">${dayData.name}</div><div class="day-dist">${dayData.dist} km</div><div class="day-pace">${dayData.pace}/km</div><div class="day-hr">${dayData.hr ? 'HR ' + dayData.hr : ''}</div>${tagHtml}`;
+    col.appendChild(body);
+  } else if (dayData && dayData.type === 'planned') {
+    const body     = document.createElement('div');
+    body.className = 'day-planned';
+    body.innerHTML = `<strong>${dayData.planned}</strong>` + (dayData.detail ? `<small>${dayData.detail}</small>` : '');
+    col.appendChild(body);
+  } else {
+    const body       = document.createElement('div');
+    body.className   = 'day-off';
+    body.textContent = 'OFF';
+    col.appendChild(body);
+  }
 
-    wd.appendChild(col);
+  const enriched = Object.assign({}, dayData || {type: 'rest'}, {displayDate, dayName, dateStr, isToday: today});
+  col.addEventListener('click', () => {
+    if (selectedCol) selectedCol.classList.remove('selected');
+    col.classList.add('selected');
+    selectedCol = col;
+    openOverlay(enriched);
   });
+
+  return col;
 }
 
-buildWeek(week0, 'wd0');
-buildWeek(week1, 'wd1');
-buildWeek(week2, 'wd2');
+// ── Week renderer ─────────────────────────────────────────────────────────────
+async function renderWeek(weekDef, container) {
+  const section  = document.createElement('div');
 
-// CHART
-const kmData = [
-  {w:'23.02–01.03', km:36.6},
-  {w:'02–08.03',    km:48.9},
-  {w:'09–15.03',    km:47.7},
-  {w:'16–22.03',    km:55.8},
-  {w:'23–30.03',    km:66.6},
-  {w:'31.03–06.04', km:77.2},
-  {w:'07–13.04',    km:64.2},
-  {w:'14–20.04',    km:32.6, partial:true},
-];
-new Chart(document.getElementById('kmChart'),{
-  type:'bar',
-  data:{
-    labels: kmData.map(d=>d.w),
-    datasets:[{
-      data: kmData.map(d=>d.km),
-      backgroundColor: kmData.map(d=>d.partial?'#ccc':'#0a0a0a'),
-      borderColor: kmData.map(d=>d.partial?'#aaa':'#0a0a0a'),
-      borderWidth:1,
-    }]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    plugins:{
-      legend:{display:false},
-      tooltip:{callbacks:{label:ctx=>ctx.parsed.y.toFixed(1)+' km'+(kmData[ctx.dataIndex].partial?' (w toku)':'')}}
+  const sHead    = document.createElement('div');
+  sHead.className   = 'section-head';
+  sHead.textContent = weekDef.sectionTitle;
+  section.appendChild(sHead);
+
+  const block    = document.createElement('div');
+  block.className   = 'week-block';
+
+  const titleEl  = document.createElement('div');
+  titleEl.className = 'week-title';
+  const subHtml  = weekDef.kmSubText ? `<span>${weekDef.kmSubText}</span>` : '';
+  titleEl.innerHTML = `<span>${weekDef.displayLabel}</span><span class="week-km">${weekDef.kmText || ''}${subHtml}</span>`;
+  block.appendChild(titleEl);
+
+  const daysDiv   = document.createElement('div');
+  daysDiv.className = 'week-days';
+  const scrollWrap  = document.createElement('div');
+  scrollWrap.className = 'week-days-scroll';
+  scrollWrap.appendChild(daysDiv);
+  block.appendChild(scrollWrap);
+  section.appendChild(block);
+  container.appendChild(section);   // append early so header is visible while days load
+
+  const dates     = getWeekDates(weekDef.start);
+  const dayDataArr = await Promise.all(dates.map(fetchDay));
+  dates.forEach((dateStr, i) => daysDiv.appendChild(buildDayCol(dateStr, dayDataArr[i])));
+}
+
+// ── Bootstrap ────────────────────────────────────────────────────────────────
+async function init() {
+  const [config, manifest] = await Promise.all([
+    fetch('data/config.json').then(r => r.json()),
+    fetch('data/manifest.json').then(r => r.json()),
+  ]);
+
+  // Header
+  document.getElementById('hName').textContent         = config.athlete;
+  document.getElementById('hSub').textContent          = config.subtitle;
+  document.getElementById('hCountdown').textContent    = getDaysToRace(config.raceDate);
+  document.getElementById('hCountdownLabel').textContent = `dni do startu · ${config.raceDateLabel}`;
+
+  // PRs
+  const prsEl = document.getElementById('prs');
+  config.prs.forEach(pr => {
+    prsEl.innerHTML += `<div class="pr-cell"><div class="pr-label">${pr.label}</div><div class="pr-value">${pr.value}</div><div class="pr-note">${pr.note}</div></div>`;
+  });
+
+  // Chart
+  const kmData = manifest.chartWeeks;
+  new Chart(document.getElementById('kmChart'), {
+    type: 'bar',
+    data: {
+      labels:   kmData.map(d => d.label),
+      datasets: [{
+        data:            kmData.map(d => d.km),
+        backgroundColor: kmData.map(d => d.partial ? '#ccc' : '#0a0a0a'),
+        borderColor:     kmData.map(d => d.partial ? '#aaa' : '#0a0a0a'),
+        borderWidth: 1,
+      }]
     },
-    scales:{
-      x:{ticks:{font:{size:9,family:'Courier Prime'},maxRotation:35,color:'#888',autoSkip:false},grid:{display:false}},
-      y:{min:0,max:90,ticks:{font:{size:9},stepSize:30,color:'#888'},grid:{color:'#e8e3da'}}
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {display: false},
+        tooltip: {callbacks: {label: ctx => ctx.parsed.y.toFixed(1) + ' km' + (kmData[ctx.dataIndex].partial ? ' (w toku)' : '')}}
+      },
+      scales: {
+        x: {ticks: {font: {size: 9, family: 'Courier Prime'}, maxRotation: 35, color: '#888', autoSkip: false}, grid: {display: false}},
+        y: {min: 0, max: 90, ticks: {font: {size: 9}, stepSize: 30, color: '#888'}, grid: {color: '#e8e3da'}}
+      }
     }
+  });
+
+  // Weeks (sequential so order is preserved and each header appears before its days load)
+  const weeksContainer = document.getElementById('weeksContainer');
+  for (const week of manifest.displayWeeks) {
+    await renderWeek(week, weeksContainer);
   }
-});
+
+  // Reference paces
+  const paceRef = document.getElementById('paceRef');
+  config.paces.forEach(p => {
+    paceRef.innerHTML += `<div class="pace-cell"><div class="pace-type">${p.type}</div><div class="pace-val">${p.val}</div></div>`;
+  });
+
+  // Notes
+  const notesGrid = document.getElementById('notesGrid');
+  config.notes.forEach(n => {
+    notesGrid.innerHTML += `<div class="note-row"><div class="note-title">${n.title}</div><div class="note-body">${n.body}</div></div>`;
+  });
+
+  // Footer
+  document.getElementById('footer').innerHTML =
+    `<span>Aktualizacja: ${manifest.lastUpdated}</span><span>${config.footerNote}</span><span>${config.coTrainer}</span>`;
+}
+
+init();
 </script>
 </body>
 </html>

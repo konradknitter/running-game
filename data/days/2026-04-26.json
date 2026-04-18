@@ -1,0 +1,30 @@
+{
+  "type": "run",
+  "name": "LONDON MARATHON",
+  "dist": 42.2,
+  "pace": "4:37 cel",
+  "hr": "—",
+  "tag": "race",
+  "tagLabel": "RACE",
+  "stats": [
+    ["Dystans",      "42,195 km"],
+    ["Cel",          "3:15:00"],
+    ["Target pace",  "4:37/km"],
+    ["Km 1–10",      "4:40–4:45 — trzymaj!"],
+    ["Km 10–30",     "4:37"],
+    ["Km 30–42",     "full send"],
+    ["Temperatura",  "~10–14°C"],
+    ["Gele",         "start · 7 · 14 · 21 · 30 km"]
+  ],
+  "laps": [
+    {"n": "Km 1–10",  "pace": "4:40–4:45/km", "hr": "~148–152", "note": "kontrolowany start — tłum ciągnie, nie daj się"},
+    {"n": "Km 10–21", "pace": "4:37/km",       "hr": "~152–158", "note": "buduj rytm"},
+    {"n": "Km 21–30", "pace": "4:37/km",       "hr": "~158–163", "note": "utrzymaj"},
+    {"n": "Km 30–42", "pace": "all in",         "hr": "wszystko", "note": "tu się decyduje 3:15"}
+  ],
+  "feedback": "Tłum na starcie wciągnie — nie daj się. Pierwsze 10 km spokojnie, nawet jeśli czujesz się za dobrze. To pożyczka której nie oddasz. Buduj rytm od połowy. Londyn będzie chłodny — idealne warunki dla Ciebie.",
+  "rules": [
+    {"t": "Najważniejsza zasada", "b": "Km 1 Londynu musi być wolniejszy niż km 40. Nie ma innej drogi do 3:15."},
+    {"t": "Twoja historia",       "b": "Tokyo 3:22 — spokojny start, silny finisz. Berlin 4:19 — za gorąco, za szybko, biodro. Londyn = Tokyo, nie Berlin."}
+  ]
+}

@@ -1,5 +1,22 @@
 {
-  "type": "planned",
-  "planned": "6–8 km easy",
-  "detail": "+ 4–6 strides 20s · swobodnie"
+  "type": "run",
+  "name": "Ok, ok",
+  "dist": 8.9,
+  "pace": "5:28",
+  "hr": "128",
+  "tag": "good",
+  "tagLabel": "Taper ✓",
+  "stats": [
+    ["Dystans",   "8,9 km"],
+    ["Czas",      "~48m 50s"],
+    ["Avg pace",  "~5:28/km"],
+    ["Avg HR",    "~128 bpm"],
+    ["Typ",       "Easy taper — D-8 do Londynu"]
+  ],
+  "laps": [],
+  "feedback": "Idealna dawka na D-8. 8,9 km spokojnie — tytuł 'Ok, ok' mówi wszystko: nie hero, nie strach, po prostu zrobione. Nogi nie protestowały, forma czeka w środku. Od dziś nogi odpoczywają. Jutro 18 km z segmentem MP — to ostatni bodziec, potem już tylko świeżenie.",
+  "rules": [
+    {"t": "Aktualny status", "b": "Tydzień taperu: 41,5 km (Pn–So). Forma jest — potwierdziły to interwały we wtorek i solidne easy przebiegi. Ciało czeka na Londyn."},
+    {"t": "Priorytet na dziś / jutro", "b": "Dużo wody, dobry sen, nogi na górze wieczorem. Jutro ostatni jakościowy bieg — potem schodzisz."}
+  ]
 }

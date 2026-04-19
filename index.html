@@ -364,8 +364,8 @@ async function renderWeek(weekDef, container) {
 
   const titleEl  = document.createElement('div');
   titleEl.className = 'week-title';
-  const subHtml  = weekDef.kmSubText ? `<span>${weekDef.kmSubText}</span>` : '';
-  titleEl.innerHTML = `<span>${weekDef.displayLabel}</span><span class="week-km">${weekDef.kmText || ''}${subHtml}</span>`;
+  // Placeholder — will be updated once day files are fetched
+  titleEl.innerHTML = `<span>${weekDef.displayLabel}</span><span class="week-km" id="wkm-${weekDef.start}">${weekDef.kmText || '…'}</span>`;
   block.appendChild(titleEl);
 
   const daysDiv   = document.createElement('div');
@@ -377,8 +377,28 @@ async function renderWeek(weekDef, container) {
   section.appendChild(block);
   container.appendChild(section);   // append early so header is visible while days load
 
-  const dates     = getWeekDates(weekDef.start);
+  const dates      = getWeekDates(weekDef.start);
   const dayDataArr = await Promise.all(dates.map(fetchDay));
+
+  // ── Auto-compute km from actual run entries (past days only) ──────────────
+  const todayStr  = new Date().toISOString().split('T')[0];
+  const weekEnd   = dates[6];
+  let   totalKm   = 0;
+  let   hasRuns   = false;
+  dayDataArr.forEach((d, i) => {
+    if (d && d.type === 'run' && d.dist && dates[i] <= todayStr) {
+      totalKm += d.dist;
+      hasRuns  = true;
+    }
+  });
+  if (hasRuns) {
+    const isPartial = weekEnd > todayStr;
+    const kmStr     = totalKm.toFixed(1).replace('.', ',') + ' km';
+    const subHtml   = isPartial && weekDef.kmSubText ? `<span>${weekDef.kmSubText}</span>` : '';
+    const el        = document.getElementById(`wkm-${weekDef.start}`);
+    if (el) el.innerHTML = kmStr + subHtml;
+  }
+
   dates.forEach((dateStr, i) => daysDiv.appendChild(buildDayCol(dateStr, dayDataArr[i])));
 }
 

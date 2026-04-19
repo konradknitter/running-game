@@ -1,5 +1,22 @@
 {
-  "type": "planned",
-  "planned": "18 km",
-  "detail": "14–15 km easy + 3 km @ 4:35–4:40 · dolna granica!"
+  "type": "run",
+  "name": "8 urodziny Swords LSD",
+  "dist": 20.1,
+  "pace": "5:18",
+  "hr": "133",
+  "tag": "good",
+  "tagLabel": "Zamknięte",
+  "stats": [
+    ["Dystans",   "20,1 km"],
+    ["Czas",      "~1h 46m"],
+    ["Avg pace",  "~5:18/km"],
+    ["Typ",       "LSD grupowy — urodziny Swords"],
+    ["Plan",      "18 km — przekroczone o 2,1 km"]
+  ],
+  "laps": [],
+  "feedback": "Ostatni porządny bieg przed Londynem — zaliczone. 20,1 km zamiast planowanych 18 km — 2 km ponad plan to przy objętości maratonu żaden problem. Grupowy LSD urodzinowy to dobry kontekst: tempo narzucone przez grupę, nie przez ambicje. Forma potwierdzona, nogi odpowiedziały. Od teraz schodzisz — żadnych bohaterskich ruchów do niedzieli.",
+  "rules": [
+    {"t": "Co teraz", "b": "Pn–Wt: bardzo krótko lub wolne. Śr: 4×600 m rytmowo (nie zgon). Czw: 8 km easy ostatni bieg. Pt: przylot Londyn — nogi na górze. So: shakeout 20 min + 4 strides. Nd: RACE."},
+    {"t": "Bilans tygodnia taperu", "b": "Tydzień 13–19.04: ~61 km — idealny taper po ciężkim tygodniu 07–13.04 (64 km). Forma jest, zmęczenie odpoczęło."}
+  ]
 }
